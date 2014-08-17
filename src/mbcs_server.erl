@@ -45,7 +45,7 @@
 %%--------------------------------------------------------------------------
 
 start() ->
-    DictPath = code:priv_dir(mbcs),
+    DictPath = priv_dir(),
     {ok, CodecsList}  = file:consult(DictPath ++ "/codecs.conf"),
     {ok, MbcsDictBin} = file:read_file(DictPath ++ "/mbcs.dict"),
     State = #mbcs_server{codecs = dict:from_list(CodecsList),
@@ -357,3 +357,12 @@ do_from_to_binary(Binary, InputEncoding, OutputEncoding, Options, State=#mbcs_se
                     StringOrBinary
             end
     end.
+
+priv_dir() ->
+   case code:priv_dir(mbcs) of
+       {error, bad_name} ->
+           Ebin = filename:dirname(code:which(?MODULE)),
+           filename:join(filename:dirname(Ebin), "priv");
+       Priv ->
+           Priv
+   end.
